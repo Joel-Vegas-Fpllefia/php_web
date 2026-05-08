@@ -1,11 +1,16 @@
--- Tabla única para Cursos/Documentos y Library
-CREATE TABLE IF NOT EXISTS reference_docs (
+CREATE TABLE tutorials (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
-    description TEXT,
-    content_html TEXT, -- Aquí se guarda el código HTML del documento
-    category VARCHAR(100), -- 'dashboard' o 'library'
-    thumbnail TEXT,
-    external_url TEXT, -- Opcional, por si es un video
+    content TEXT NOT NULL,
+    type VARCHAR(50),
+    location VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Para añadir la columna si no existe
+ALTER TABLE reference_docs ADD COLUMN IF NOT EXISTS pdf_url VARCHAR(255);
+
+-- Ejemplo para vincular un archivo a una noticia específica (ID 1)
+UPDATE reference_docs 
+SET pdf_url = 'uploads/pdf/psicologia-color.pdf' 
+WHERE id = 1;
