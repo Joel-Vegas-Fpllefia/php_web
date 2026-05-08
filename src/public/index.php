@@ -34,18 +34,7 @@ try {
 <body class="antialiased text-gray-900">
 
 
-<nav class="flex items-center gap-6">
-    <a href="index.php">Home</a>
-    <a href="library.php">Library</a>
-    
-    <?php if (isAdmin()): ?>
-        <span class="text-shopify font-bold">Hola, <?= $_SESSION['username'] ?></span>
-        <a href="create-tutorial.php" class="bg-gray-100 px-4 py-2 rounded-lg text-sm">Admin</a>
-        <a href="logout.php" class="text-red-500 text-sm">Cerrar Sesión</a>
-    <?php else: ?>
-        <a href="login.php" class="text-gray-400 hover:text-black">Login</a>
-    <?php endif; ?>
-</nav>
+<?php include __DIR__ . '/includes/header.php'; ?>
 
     <main class="max-w-6xl mx-auto px-6 py-12">
         

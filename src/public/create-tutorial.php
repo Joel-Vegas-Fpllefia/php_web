@@ -45,16 +45,7 @@ $docs = $pdo->query("SELECT * FROM reference_docs ORDER BY id DESC")->fetchAll()
 </head>
 <body class="antialiased">
 
-    <nav class="bg-white border-b border-gray-200 px-8 py-3 flex justify-between items-center sticky top-0 z-50">
-        <div class="flex items-center gap-3">
-            <div class="bg-[#005c42] p-1.5 rounded-lg text-white font-bold text-xs">S</div>
-            <span class="font-semibold text-lg">Admin Panel</span>
-        </div>
-        <div class="flex gap-6 text-sm font-medium">
-            <a href="index.php" class="text-gray-500 hover:text-black">Ir a la Web</a>
-            <a href="create-tutorial.php" class="text-[#008060] border-b-2 border-[#008060]">Gestión</a>
-        </div>
-    </nav>
+    <?php include __DIR__ . '/includes/header.php'; ?>
 
     <main class="max-w-5xl mx-auto px-6 py-10">
         
