@@ -1,0 +1,39 @@
+services:
+  # Servicio de Base de Datos
+  db:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data # Esto es lo correcto para la DB
+      - ./src/config/db.sql:/docker-entrypoint-initdb.d/init.sql # <--- ESTO
+  # Servicio de PHP
+  php:
+    image: php:8.2-apache
+    container_name: php_app
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/var/www/html # Mapeamos la carpeta raíz del código
+    command:
+      - /bin/sh
+      - -c
+      - |
+        apt-get update && apt-get install -y libpq-dev
+        docker-php-ext-install pdo pdo_pgsql
+        # Cambiamos el DocumentRoot de Apache para que apunte a /public automáticamente
+        sed -ri -e 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/*.conf
+        sed -ri -e 's!/var/www/!/var/www/html/public!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+        apache2-foreground
+
+volumes:
+  db_data:
