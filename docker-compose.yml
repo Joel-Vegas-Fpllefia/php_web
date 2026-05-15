@@ -23,7 +23,7 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./src:/var/www/html # Mapeamos la carpeta raíz del código
+      - .:/var/www/html # Mapeamos la carpeta raíz del código
     command:
       - /bin/sh
       - -c
