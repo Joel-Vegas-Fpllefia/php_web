@@ -4,23 +4,22 @@ FROM php:8.2-apache
 RUN apt-get update && apt-get install -y libpq-dev \
     && docker-php-ext-install pdo pdo_pgsql
 
-# 2. Definimos la ruta REAL donde está tu index.php
-# Según tu estructura es: /var/www/html/src/public
-ENV APACHE_DOCUMENT_ROOT /var/www/html/src/public
+# 2. Copiamos los archivos del repo al contenedor
+COPY . /var/www/html/
 
-# 3. Cambiamos la configuración de Apache para que apunte a esa carpeta
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+# 3. Buscamos automáticamente dónde está el index.php y lo fijamos como Root
+# Esto funcionará si está en la raíz, en /public o en /src/public
+RUN if [ -f /var/www/html/src/public/index.php ]; then \
+        export WEBROOT=/var/www/html/src/public; \
+    elif [ -f /var/www/html/public/index.php ]; then \
+        export WEBROOT=/var/www/html/public; \
+    else \
+        export WEBROOT=/var/www/html; \
+    fi && \
+    sed -ri -e "s!/var/www/html!${WEBROOT}!g" /etc/apache2/sites-available/*.conf && \
+    sed -ri -e "s!/var/www/!${WEBROOT}!g" /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# 4. Aseguramos permisos totales para evitar el Forbidden
-RUN echo "<Directory ${APACHE_DOCUMENT_ROOT}>\n\
-    Options Indexes FollowSymLinks\n\
-    AllowOverride All\n\
-    Require all granted\n\
-</Directory>" >> /etc/apache2/apache2.conf
-
-# 5. Habilitamos el módulo rewrite y corregimos permisos de archivos
-RUN a2enmod rewrite
+# 4. Permisos críticos para evitar el Forbidden en Render
 RUN chown -R www-data:www-data /var/www/html && chmod -R 755 /var/www/html
 
-# El contenedor arranca Apache automáticamente
+RUN a2enmod rewrite
